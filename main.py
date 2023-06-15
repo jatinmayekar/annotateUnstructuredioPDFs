@@ -1,5 +1,4 @@
 import os
-# Install NLTK Data
 import nltk
 from PIL import Image, ImageDraw, ImageFont
 from pdf2image import convert_from_path
@@ -7,6 +6,8 @@ from fpdf import FPDF
 from unstructured.partition.pdf import partition_pdf
 from collections import Counter
 from unstructured.staging.base import convert_to_dict
+from collections import defaultdict
+import shutil
 
 # Dictionary for colors for each type
 color_dict = {
@@ -19,23 +20,31 @@ color_dict = {
     "PageBreak": "brown"
 }
 
-from collections import defaultdict
-
 # Paths
 input_pdf_path = "C:/Users/jatin/OneDrive/Desktop/ai/pdf_2.pdf"
-output_pdf_path = "C:/Users/jatin/OneDrive/Desktop/ai/pdf_3.pdf"
 
 # Annotate PDF
-annotate_pdf(input_pdf_path, output_pdf_path)
+annotate_pdf(input_pdf_path)
 
-def annotate_pdf(pdf_path, output_pdf_path):
-    elements = partition_pdf(pdf_path)
+def parse_pdf(pdf_path):
+    elements = partition_pdf(pdf_path,strategy="hi_res")
+    list_elements(elements)
+    return convert_to_dict(elements)
 
+def list_elements(elements)
     print("List of elements identified:\n")
     display(Counter(type(element) for element in elements))
-    print("")
-    
-    data = convert_to_dict(elements)
+
+def copy_pdf(pdf_path):
+    directory, file_name = os.path.split(pdf_path)
+    base_name, ext = os.path.splitext(file_name);
+    new_file_name = f"{base_name}_annotate{ext}"
+    new_file_path = os.path.join(directory, new_file_name)
+    shutil.copy(file_path, new_file_path)
+    return new_file_path
+
+def annotate_pdf(pdf_path):   
+    data = parse_pdf(pdf_path);
 
     # Convert the pdf pages into images
     images = convert_from_path(pdf_path)
@@ -83,6 +92,6 @@ def annotate_pdf(pdf_path, output_pdf_path):
         pdf.image(img_path, x=0, y=0, w=210, h=297)  # width and height are in millimeters
         os.remove(img_path)  # Remove the temporary image
 
+    output_pdf_path = copy_pdf(pdf_path)
     pdf.output(output_pdf_path)
 
-    
