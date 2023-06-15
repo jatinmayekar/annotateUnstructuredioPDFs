@@ -1,7 +1,12 @@
 import os
+# Install NLTK Data
+import nltk
 from PIL import Image, ImageDraw, ImageFont
 from pdf2image import convert_from_path
 from fpdf import FPDF
+from unstructured.partition.pdf import partition_pdf
+from collections import Counter
+from unstructured.staging.base import convert_to_dict
 
 # Dictionary for colors for each type
 color_dict = {
@@ -21,9 +26,17 @@ input_pdf_path = "C:/Users/jatin/OneDrive/Desktop/ai/pdf_2.pdf"
 output_pdf_path = "C:/Users/jatin/OneDrive/Desktop/ai/pdf_3.pdf"
 
 # Annotate PDF
-annotate_pdf(data_1, input_pdf_path, output_pdf_path)
+annotate_pdf(input_pdf_path, output_pdf_path)
 
-def annotate_pdf(data, pdf_path, output_pdf_path):
+def annotate_pdf(pdf_path, output_pdf_path):
+    elements = partition_pdf(pdf_path)
+
+    print("List of elements identified:\n")
+    display(Counter(type(element) for element in elements))
+    print("")
+    
+    data = convert_to_dict(elements)
+
     # Convert the pdf pages into images
     images = convert_from_path(pdf_path)
 
